@@ -1,0 +1,6 @@
+[
+  "org-a/project-x",
+  { "owner": "org-b", "repo": "project-y" },
+  { "url": "https://gitcode.com/org-c/project-z" }
+]
+

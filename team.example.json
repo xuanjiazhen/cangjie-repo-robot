@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "team.v1",
+  "updatedAt": "2026-01-21T00:00:00Z",
+  "sources": [],
+  "groups": [
+    {
+      "id": "group-1",
+      "name": "AgentDSL",
+      "leaderUsernames": ["leader_username"],
+      "memberUsernames": ["leader_username", "member_username"],
+      "notes": ""
+    }
+  ],
+  "people": [
+    {
+      "username": "leader_username",
+      "gitcodeId": "0",
+      "realName": "张三",
+      "email": "",
+      "isConfirmed": false,
+      "isCommitter": true,
+      "isLeader": true,
+      "notes": "可填写备注",
+      "groups": ["group-1"],
+      "repos": [
+        {
+          "owner": "example_owner",
+          "repo": "example_repo",
+          "permission": "admin",
+          "roleName": "committer",
+          "roleNameCn": "仓颉Committer",
+          "accessLevel": 0,
+          "permissions": { "admin": true }
+        }
+      ]
+    },
+    {
+      "username": "member_username",
+      "gitcodeId": "0",
+      "realName": "李四",
+      "email": "",
+      "isConfirmed": false,
+      "isCommitter": false,
+      "isLeader": false,
+      "notes": "",
+      "groups": ["group-1"],
+      "repos": [
+        {
+          "owner": "example_owner",
+          "repo": "example_repo",
+          "permission": "pull",
+          "roleName": "developer",
+          "roleNameCn": "开发者",
+          "accessLevel": 0,
+          "permissions": { "admin": false }
+        }
+      ]
+    }
+  ]
+}

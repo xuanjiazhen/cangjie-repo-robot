@@ -1,0 +1,19 @@
+# 每行一个仓库：支持 owner/repo 或 GitCode 仓库URL
+# 例如（请替换成你自己的真实仓库）：
+#   org-a/project-x
+#   https://gitcode.com/org-b/project-y
+#
+# 注意：本文件默认不提供可用仓库，避免直接运行时因 “Project not found” 报错。
+
+Cangjie/cangjie_compiler
+Cangjie/cangjie_runtime
+Cangjie/cangjie_tools
+Cangjie/cangjie_stdx
+Cangjie/cangjie_build
+Cangjie/cangjie_docs
+Cangjie/llvm-project
+Cangjie/cangjie_test
+Cangjie/cangjie_test_framework
+Cangjie/cangjie_js_interop
+Cangjie/cangjie_python_interop
+Cangjie/cangjie_multiplatform_interop

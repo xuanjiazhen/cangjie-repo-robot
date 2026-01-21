@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/cangjie-repo-robot/team.schema.json",
+  "title": "Team Directory Schema (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "sources", "groups", "people"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "team.v1"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "ISO timestamp, e.g. 2026-01-21T10:00:00Z"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["owner", "repo", "fetchedAt"],
+        "properties": {
+          "owner": { "type": "string" },
+          "repo": { "type": "string" },
+          "fetchedAt": { "type": "string" },
+          "pageSize": { "type": "integer", "minimum": 1 },
+          "pagesFetched": { "type": "integer", "minimum": 1 },
+          "memberCount": { "type": "integer", "minimum": 0 },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "description": "团队列表（历史字段名为 groups；此处语义等同于 teams）。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "leaderUsernames", "memberUsernames"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string", "description": "团队名称（建议与 README 的团队信息章节一致）" },
+          "leaderUsernames": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "memberUsernames": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["username", "gitcodeId", "realName", "email", "groups", "repos"],
+        "properties": {
+          "username": { "type": "string" },
+          "gitcodeId": { "type": ["string", "integer"] },
+          "realName": { "type": "string" },
+          "email": { "type": "string" },
+          "isConfirmed": {
+            "type": "boolean",
+            "description": "是否已人工确认并设置完所有信息；为 true 时通常不需要再自动更新该成员信息"
+          },
+          "isCommitter": {
+            "description": "是否为 committer（自动判断）：只要该成员在任一仓库的项目角色为「仓颉Committer」，则为 true。",
+            "type": "boolean"
+          },
+          "isLeader": { "type": "boolean" },
+          "notes": { "type": "string" },
+          "groups": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "repos": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["owner", "repo"],
+              "properties": {
+                "owner": { "type": "string" },
+                "repo": { "type": "string" },
+                "permission": { "type": "string" },
+                "roleName": { "type": "string" },
+                "roleNameCn": { "type": "string" },
+                "accessLevel": { "type": ["integer", "null"] },
+                "permissions": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
