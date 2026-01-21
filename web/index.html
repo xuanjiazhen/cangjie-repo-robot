@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>团队人员信息（team.v1）</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__title">
+        <div class="topbar__name">团队人员信息</div>
+        <div class="topbar__desc">加载 / 编辑 / 保存 team.v1 JSON</div>
+      </div>
+
+      <div class="topbar__actions">
+        <button id="btnOpenWithHandle" class="btn btn--primary" type="button">
+          打开本地JSON（可回写）
+        </button>
+        <label class="btn btn--ghost" for="fileInput">
+          选择文件（仅加载）
+        </label>
+        <input id="fileInput" class="sr-only" type="file" accept="application/json" />
+
+        <div class="remote">
+          <input id="remoteUrl" class="input" type="url" placeholder="远程JSON地址（需支持CORS）" />
+          <button id="btnLoadRemote" class="btn btn--ghost" type="button">加载</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <button id="btnSave" class="btn btn--primary" type="button">保存到文件</button>
+        <button id="btnDownload" class="btn btn--ghost" type="button">下载JSON</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="section">
+          <div class="section__header">
+            <div class="section__title">邮箱推断姓名</div>
+          </div>
+          <div class="filters">
+            <div class="hint">
+              规则：邮箱以 <code>@huawei</code> / <code>@h-partners</code> 结尾时，取邮箱前缀去数字并保留字母作为拼音；仅在姓名为空或等于 username 时建议覆盖。
+            </div>
+            <div class="rowActions">
+              <button id="btnNameInferPreview" class="btn btn--ghost" type="button" disabled>预览</button>
+              <button id="btnNameInferApply" class="btn btn--primary" type="button" disabled>一键应用</button>
+            </div>
+            <div id="nameInferSummary" class="hint"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section__header">
+            <div class="section__title">团队</div>
+            <button id="btnAddGroup" class="btn btn--small btn--ghost" type="button">新增</button>
+          </div>
+          <div id="groupsList" class="groups"></div>
+          <div class="filters" style="margin-top:10px;">
+            <select id="teamLeaderSelect" class="input" disabled>
+              <option value="">选择当前团队 leader…</option>
+            </select>
+            <div class="rowActions">
+              <button id="btnSetTeamLeader" class="btn btn--ghost" type="button" disabled>设置 leader</button>
+              <button id="btnClearTeamLeader" class="btn btn--ghost" type="button" disabled>清除 leader</button>
+            </div>
+            <div class="hint" style="margin-top:6px;">团队 leader 即为成员 leader（自动同步）。</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section__header">
+            <div class="section__title">筛选</div>
+          </div>
+          <div class="filters">
+            <input id="searchInput" class="input" type="search" placeholder="搜索：username / 姓名 / 邮箱" />
+            <input id="repoFilterInput" class="input" type="search" placeholder="来源仓库过滤：owner/repo 关键字" />
+            <input id="roleFilterInput" class="input" type="search" placeholder="角色过滤：如 仓颉Committer / 开发者 / 管理员" />
+            <label class="check">
+              <input id="filterUnconfirmed" type="checkbox" />
+              <span>仅看未确认</span>
+            </label>
+            <label class="check">
+              <input id="filterMissingEmail" type="checkbox" />
+              <span>仅看缺少邮箱</span>
+            </label>
+            <label class="check">
+              <input id="filterMissingName" type="checkbox" />
+              <span>仅看缺少姓名</span>
+            </label>
+            <label class="check">
+              <input id="filterMissingRole" type="checkbox" />
+              <span>仅看缺少角色</span>
+            </label>
+            <label class="check">
+              <input id="filterCommitter" type="checkbox" />
+              <span>仅看 committer</span>
+            </label>
+            <label class="check">
+              <input id="filterLeader" type="checkbox" />
+              <span>仅看 leader</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section__header">
+            <div class="section__title">状态</div>
+          </div>
+          <div class="status">
+            <div><span class="k">文件</span><span id="statusFile" class="v">未加载</span></div>
+            <div><span class="k">小组</span><span id="statusGroups" class="v">0</span></div>
+            <div><span class="k">成员</span><span id="statusPeople" class="v">0</span></div>
+            <div><span class="k">变更</span><span id="statusDirty" class="v">否</span></div>
+            <div class="hint" id="statusHint"></div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="table__toolbar">
+          <div class="table__title">成员列表</div>
+          <div class="table__tips">
+            committer：自动判断（任一仓库角色为「仓颉Committer」即为 committer）；项目角色：来自仓库成员列表接口；leader：按团队设置 leader 后自动同步到成员
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table class="table" id="peopleTable">
+            <thead>
+              <tr>
+                <th class="col-username">GitCode Id</th>
+                <th class="col-username">GitCode username</th>
+                <th class="col-text">真实姓名</th>
+                <th class="col-text">邮箱</th>
+                <th class="col-flag">已确认</th>
+                <th class="col-text">项目角色</th>
+                <th class="col-flag">committer</th>
+                <th class="col-flag">leader</th>
+                <th class="col-groups">所属团队</th>
+                <th class="col-text">备注</th>
+                <th class="col-repos">来源仓库</th>
+              </tr>
+            </thead>
+            <tbody id="peopleTbody">
+              <tr>
+                <td colspan="11" class="empty">请先加载 team.json（本地或远程）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <div id="nameInferModal" class="modal" aria-hidden="true">
+      <div class="modal__backdrop" data-action="close"></div>
+      <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="nameInferTitle">
+        <div class="modal__header">
+          <div>
+            <div id="nameInferTitle" class="modal__title">邮箱推断姓名：预览</div>
+            <div id="nameInferMeta" class="modal__meta"></div>
+          </div>
+          <button class="btn btn--ghost" type="button" data-action="close">关闭</button>
+        </div>
+        <div class="modal__body">
+          <div id="nameInferList" class="modal__list"></div>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--ghost" type="button" data-action="close">取消</button>
+          <button id="btnNameInferApplyInModal" class="btn btn--primary" type="button">应用这些变更</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+
